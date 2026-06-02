@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Mark JS as available so scroll-reveal only hides content when it can also reveal it (no-JS / crawlers see everything). -->
+<script>document.documentElement.classList.add('js');</script>
+<title>ChukkaTimer: Polo game timer, live scoring & sharing</title>
+<meta name="description" content="ChukkaTimer is the essential polo timing app for iPhone. A one-tap chukka timer with warning bells, full game mode with teams, handicaps and scoring, and live sharing so spectators can follow the match from any browser." />
+<meta name="theme-color" content="#1f7a52" />
+
+<!-- Social / link previews -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="ChukkaTimer: Polo timing, beautifully kept." />
+<meta property="og:description" content="A one-tap chukka timer, full game mode with handicaps and scoring, and live sharing for spectators — on your iPhone." />
+<meta property="og:image" content="assets/icon.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="ChukkaTimer: Polo timing, beautifully kept." />
+<meta name="twitter:description" content="A one-tap chukka timer, full game mode with handicaps and scoring, and live sharing for spectators." />
+<meta name="twitter:image" content="assets/icon.png" />
+
+<link rel="icon" href="assets/icon.png" />
+<link rel="apple-touch-icon" href="assets/icon.png" />
+
+<!-- Fonts: Fraunces (editorial display) + Hanken Grotesk (body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   ChukkaTimer landing page
+   Palette anchor: app icon — brass bell on a polo-field green.
+   ============================================================ */
+:root{
+  --brand:        #1f7a52;   /* polo-field green (primary, glows) */
+  --brand-ink:    #15613f;   /* darker green for text/hover on light */
+  --brand-deep:   #0f3d28;
+  --brand-tint:   #e8f2ec;   /* pale green wash for chips/cards */
+  --brand-tint-2: #d6e8de;
+  --gold:         #c79a3e;   /* brass accent (the bell) */
+  --gold-2:       #e3c46f;
+
+  --bg:     #faf7ef;         /* warm paper */
+  --bg-2:   #f1ecdf;         /* deeper warm band */
+  --card:   #ffffff;
+  --ink:    #16201a;         /* near-black, faint green */
+  --ink-2:  #515b54;         /* secondary text */
+  --ink-3:  #868f88;         /* tertiary / captions */
+  --line:   rgba(22,32,26,.10);
+  --line-2: rgba(22,32,26,.06);
+
+  --night:  #102017;         /* dark section bg */
+  --night-2:#16291d;
+
+  --r-lg: 28px;
+  --r-md: 18px;
+  --r-sm: 12px;
+
+  --shadow-sm: 0 1px 2px rgba(16,40,24,.06), 0 4px 14px -6px rgba(16,40,24,.14);
+  --shadow-md: 0 10px 30px -12px rgba(16,40,24,.24);
+  --shadow-lg: 0 40px 80px -28px rgba(12,40,24,.42);
+
+  --maxw: 1140px;
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--bg);
+  line-height:1.6;
+  font-size:17px;
+  letter-spacing:-.005em;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+
+/* Grain overlay adds quiet texture instead of flat fills */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  opacity:.035; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+a{ color:inherit; text-decoration:none; }
+img{ display:block; max-width:100%; }
+:focus-visible{ outline:2.5px solid var(--brand); outline-offset:3px; border-radius:6px; }
+
+.wrap{ width:100%; max-width:var(--maxw); margin:0 auto; padding:0 24px; }
+.eyebrow{
+  font-size:12.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--brand-ink);
+}
+.serif{ font-family:var(--display); }
+.muted{ color:var(--ink-2); }
+
+h1,h2,h3{ font-family:var(--display); font-weight:600; line-height:1.04; letter-spacing:-.02em; margin:0; }
+h2{ font-size:clamp(30px,4.4vw,46px); }
+h3{ font-size:21px; letter-spacing:-.01em; line-height:1.2; }
+p{ margin:0; }
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; gap:9px;
+  font-family:var(--sans); font-weight:600; font-size:16px;
+  padding:13px 22px; border-radius:999px; cursor:pointer;
+  border:1px solid transparent; transition:transform .18s ease, box-shadow .25s ease, background .2s ease, border-color .2s;
+  white-space:nowrap;
+}
+.btn:active{ transform:translateY(1px); }
+.btn-primary{ background:var(--brand); color:#fff; box-shadow:0 10px 24px -10px rgba(31,122,82,.7); }
+.btn-primary:hover{ background:var(--brand-ink); transform:translateY(-2px); box-shadow:0 16px 30px -10px rgba(31,122,82,.65); }
+.btn-ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+.btn-ghost:hover{ border-color:var(--ink); transform:translateY(-2px); background:rgba(22,32,26,.02); }
+
+/* Apple App Store badge (custom, tasteful) */
+.badge-apple{
+  display:inline-flex; align-items:center; gap:11px;
+  background:#111914; color:#fff; padding:11px 20px 11px 18px; border-radius:14px;
+  border:1px solid #2a3630; transition:transform .18s ease, box-shadow .25s ease;
+  box-shadow:var(--shadow-sm);
+}
+.badge-apple:hover{ transform:translateY(-2px); box-shadow:var(--shadow-md); }
+.badge-apple svg{ width:26px; height:26px; flex:none; }
+.badge-apple .b-txt{ display:flex; flex-direction:column; line-height:1.05; }
+.badge-apple .b-txt small{ font-size:11px; letter-spacing:.03em; opacity:.82; }
+.badge-apple .b-txt strong{ font-size:18.5px; font-weight:600; letter-spacing:-.01em; }
+
+/* ---------- nav ---------- */
+header.nav{
+  position:sticky; top:0; z-index:100;
+  background:color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter:saturate(160%) blur(14px);
+  -webkit-backdrop-filter:saturate(160%) blur(14px);
+  border-bottom:1px solid transparent; transition:border-color .3s, background .3s;
+}
+header.nav.scrolled{ border-bottom-color:var(--line); }
+.nav-inner{ display:flex; align-items:center; justify-content:space-between; height:68px; }
+.brand{ display:flex; align-items:center; gap:11px; font-weight:600; font-size:19px; letter-spacing:-.02em; }
+.brand .glyph{
+  width:34px; height:34px; border-radius:9px;
+  background:linear-gradient(155deg,#163f2c,#0f3122);
+  display:grid; place-items:center; box-shadow:0 6px 14px -6px rgba(16,49,34,.8), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.brand .glyph svg{ width:19px; height:19px; }
+.nav-links{ display:flex; align-items:center; gap:34px; }
+.nav-links a{ font-size:15px; font-weight:500; color:var(--ink-2); transition:color .2s; }
+.nav-links a:hover{ color:var(--ink); }
+.nav-cta{ display:flex; align-items:center; gap:14px; }
+
+/* ---------- hero ---------- */
+.hero{ position:relative; padding:74px 0 90px; overflow:hidden; }
+.glow{ position:absolute; inset:0; z-index:-1; pointer-events:none; }
+.glow::before, .glow::after{ content:""; position:absolute; border-radius:50%; filter:blur(80px); opacity:.5; }
+.glow::before{ width:620px; height:620px; left:-160px; top:-220px;
+  background:radial-gradient(circle, rgba(31,122,82,.50), transparent 70%); }
+.glow::after{ width:520px; height:520px; right:-140px; top:40px;
+  background:radial-gradient(circle, rgba(199,154,62,.34), transparent 70%); }
+.hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:40px; align-items:center; }
+
+.pill{
+  display:inline-flex; align-items:center; gap:9px;
+  background:var(--card); border:1px solid var(--line);
+  padding:7px 14px 7px 11px; border-radius:999px; box-shadow:var(--shadow-sm);
+  font-size:13px; font-weight:500; color:var(--ink-2);
+}
+.pill .dot{ width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 3px rgba(199,154,62,.2); }
+
+h1.hero-title{
+  font-size:clamp(42px,6.4vw,76px); line-height:.98; margin:22px 0 0;
+  letter-spacing:-.03em;
+}
+h1.hero-title em{ font-style:italic; color:var(--brand-ink); font-weight:500; }
+.hero-sub{ font-size:clamp(17px,2.2vw,20px); color:var(--ink-2); margin-top:22px; max-width:31em; }
+.hero-actions{ display:flex; align-items:center; gap:14px; margin-top:32px; flex-wrap:wrap; }
+.hero-note{ display:flex; align-items:center; gap:18px; margin-top:24px; color:var(--ink-3); font-size:14px; flex-wrap:wrap; }
+.hero-note span{ display:inline-flex; align-items:center; gap:7px; }
+.hero-note svg{ width:15px; height:15px; color:var(--brand-ink); }
+
+/* phone visual */
+.hero-art{ position:relative; justify-self:center; z-index:0; }
+.phone{
+  position:relative; width:300px; aspect-ratio:1206/2622;
+  background:#0c0c0e; border-radius:46px; padding:11px;
+  box-shadow:var(--shadow-lg), inset 0 0 0 2px rgba(255,255,255,.06);
+  border:1px solid rgba(0,0,0,.4);
+}
+.phone .screen{ width:100%; height:100%; border-radius:36px; overflow:hidden; background:#fff; position:relative; }
+.phone .screen img{ width:100%; height:100%; object-fit:cover; object-position:top center; }
+.phone .island{
+  position:absolute; top:13px; left:50%; transform:translateX(-50%);
+  width:88px; height:27px; background:#000; border-radius:999px; z-index:3;
+}
+.hero-art .phone.main{ animation:float 7s ease-in-out infinite; z-index:2; }
+.hero-art .phone.back{
+  position:absolute; width:228px; right:-66px; top:64px; z-index:1;
+  transform:rotate(7deg); opacity:.92; filter:saturate(.96);
+  box-shadow:var(--shadow-md);
+}
+
+@keyframes float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-14px); } }
+
+/* ---------- trust strip ---------- */
+.strip{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--bg); }
+.strip .wrap{ display:flex; flex-wrap:wrap; gap:14px 40px; justify-content:center; padding:22px 24px; }
+.strip .item{ display:inline-flex; align-items:center; gap:9px; font-size:14px; font-weight:500; color:var(--ink-2); }
+.strip .item svg{ width:17px; height:17px; color:var(--brand-ink); flex:none; }
+
+/* ---------- section scaffold ---------- */
+section{ padding:96px 0; }
+.sec-head{ max-width:640px; margin:0 auto 56px; text-align:center; }
+.sec-head .eyebrow{ display:block; margin-bottom:14px; }
+.sec-head p{ color:var(--ink-2); margin-top:16px; font-size:18px; }
+
+/* ---------- feature bento ---------- */
+.bento{ display:grid; grid-template-columns:repeat(6,1fr); gap:18px; }
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-md);
+  padding:28px; box-shadow:var(--shadow-sm); position:relative; overflow:hidden;
+  transition:transform .25s ease, box-shadow .3s ease, border-color .3s;
+}
+.card:hover{ transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--brand-tint-2); }
+.card.col-3{ grid-column:span 3; }
+.card.col-2{ grid-column:span 2; }
+.card .ic{
+  width:46px; height:46px; border-radius:13px; display:grid; place-items:center; margin-bottom:18px;
+  background:var(--brand-tint); color:var(--brand-ink); border:1px solid var(--brand-tint-2);
+}
+.card .ic svg{ width:23px; height:23px; }
+.card h3{ margin-bottom:8px; }
+.card p{ color:var(--ink-2); font-size:15.5px; }
+
+/* ---------- alternating showcase ---------- */
+.show{ display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; margin-top:80px; }
+.show:first-of-type{ margin-top:0; }
+.show.flip .show-art{ order:2; }
+.show-copy .eyebrow{ display:block; margin-bottom:14px; }
+.show-copy h2{ font-size:clamp(28px,3.6vw,40px); }
+.show-copy p{ color:var(--ink-2); margin-top:18px; font-size:17.5px; }
+.show-list{ list-style:none; padding:0; margin:24px 0 0; display:grid; gap:13px; }
+.show-list li{ display:flex; gap:12px; align-items:flex-start; font-size:16px; }
+.show-list svg{ width:21px; height:21px; color:var(--brand); flex:none; margin-top:2px; }
+.show-art{ display:flex; justify-content:center; }
+.show-art .phone{ width:268px; }
+
+/* ---------- live sharing highlight ---------- */
+.sharing-block{ margin-top:92px; }
+.share-stage{
+  display:grid; grid-template-columns:1.1fr .9fr; gap:48px; align-items:center;
+  padding:52px 48px; border-radius:var(--r-lg);
+  background:
+    radial-gradient(120% 140% at 12% 0%, rgba(31,122,82,.30), transparent 55%),
+    linear-gradient(158deg, #e8f2ec, #eef4ea 72%);
+  border:1px solid var(--line);
+}
+.share-stage h2{ font-size:clamp(26px,3.4vw,38px); }
+.share-stage p{ color:var(--ink-2); margin-top:16px; font-size:17px; }
+.share-list{ list-style:none; padding:0; margin:22px 0 0; display:grid; gap:11px; }
+.share-list li{ display:flex; gap:11px; align-items:flex-start; font-size:15.5px; }
+.share-list svg{ width:20px; height:20px; color:var(--brand); flex:none; margin-top:2px; }
+.share-qr{ display:flex; justify-content:center; }
+.qr-card{
+  background:#fff; border:1px solid var(--line); border-radius:var(--r-md);
+  padding:26px; box-shadow:var(--shadow-md); text-align:center; max-width:300px;
+}
+.qr-card .qr{ width:170px; height:170px; margin:0 auto; }
+.qr-card .qr svg{ width:100%; height:100%; }
+.qr-card .qr-label{ margin-top:16px; font-size:13px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); }
+.qr-card .qr-sub{ margin-top:6px; font-size:14px; color:var(--ink-2); }
+
+/* browser-framed live-site mockup */
+.webframe{ max-width:900px; margin:0 auto 8px; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow-lg); background:#fff; }
+.webbar{ height:44px; background:var(--bg-2); border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 16px; gap:8px; }
+.webbar i{ width:12px; height:12px; border-radius:50%; display:block; flex:none; }
+.webbar .r{ background:#ff5f57; } .webbar .y{ background:#febc2e; } .webbar .g{ background:#28c840; }
+.webbar .url{ margin-left:14px; flex:1; max-width:440px; background:#fff; border:1px solid var(--line); border-radius:999px;
+  font-size:12.5px; color:var(--ink-3); padding:5px 14px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.webframe img{ width:100%; height:auto; display:block; }
+.webcap{ text-align:center; max-width:48ch; margin:18px auto 0; color:var(--ink-2); font-size:15px; }
+
+/* club chukkas feature points */
+.club-feats{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:48px; }
+.club-feats .pt{ text-align:left; }
+.club-feats .pt .ic{ width:42px; height:42px; border-radius:12px; display:grid; place-items:center; margin-bottom:12px;
+  background:var(--brand-tint); color:var(--brand-ink); border:1px solid var(--brand-tint-2); }
+.club-feats .pt .ic svg{ width:21px; height:21px; }
+.club-feats .pt h3{ font-size:17px; }
+.club-feats .pt p{ color:var(--ink-2); font-size:14.5px; margin-top:6px; }
+@media (max-width:880px){ .club-feats{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:520px){ .club-feats{ grid-template-columns:1fr; } }
+
+/* ---------- privacy (dark) ---------- */
+.privacy{ background:var(--night); color:#fff; position:relative; overflow:hidden; }
+.privacy::before{ content:""; position:absolute; width:600px; height:600px; border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, rgba(31,122,82,.40), transparent 70%); filter:blur(70px);
+  top:-200px; right:-120px; }
+.privacy .wrap{ position:relative; }
+.privacy .eyebrow{ color:var(--gold-2); }
+.privacy h2{ color:#fff; max-width:16ch; }
+.privacy .lead{ color:#aebcb2; font-size:19px; margin-top:18px; max-width:46ch; }
+.priv-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:48px; }
+.priv-card{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10); border-radius:var(--r-md); padding:26px; }
+.priv-card .ic{ width:44px; height:44px; border-radius:12px; background:rgba(31,122,82,.22); color:#7fd3a8;
+  display:grid; place-items:center; margin-bottom:16px; }
+.priv-card .ic svg{ width:22px; height:22px; }
+.priv-card h3{ color:#fff; font-size:19px; }
+.priv-card p{ color:#a4b1a8; font-size:15px; margin-top:8px; }
+
+/* ---------- live activities + support ---------- */
+.split{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.panel{ border:1px solid var(--line); border-radius:var(--r-lg); padding:42px; background:var(--card); box-shadow:var(--shadow-sm); }
+.panel.tint{ background:linear-gradient(160deg,var(--brand-tint),#fff); }
+.panel h2{ font-size:30px; }
+.panel p{ color:var(--ink-2); margin-top:14px; }
+.panel .actions{ display:flex; gap:12px; margin-top:26px; flex-wrap:wrap; }
+.panel .ic-lg{ width:50px; height:50px; border-radius:14px; display:grid; place-items:center; margin-bottom:18px;
+  background:var(--brand-tint); color:var(--brand-ink); border:1px solid var(--brand-tint-2); }
+.panel .ic-lg svg{ width:25px; height:25px; }
+
+/* ---------- final CTA ---------- */
+.final{ text-align:center; }
+.final .box{
+  max-width:760px; margin:0 auto; padding:64px 40px; border-radius:var(--r-lg);
+  background:linear-gradient(160deg,#21805640,#0f3d28), linear-gradient(160deg,#1f7a52,#12492f); color:#fff; position:relative; overflow:hidden;
+  box-shadow:var(--shadow-lg);
+}
+.final .box::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(circle at 70% -10%, rgba(227,196,111,.34), transparent 55%); }
+.final .box > *{ position:relative; }
+.final h2{ color:#fff; font-size:clamp(30px,4.4vw,44px); }
+.final p{ color:#dce7e0; margin-top:16px; font-size:18px; }
+.final .actions{ display:flex; gap:14px; justify-content:center; margin-top:30px; flex-wrap:wrap; }
+.final .req{ margin-top:22px; font-size:13.5px; color:#bcd0c4; }
+.final .badge-apple{ background:#fff; color:#111; border-color:rgba(255,255,255,.6); }
+
+/* ---------- footer ---------- */
+footer{ background:var(--bg-2); border-top:1px solid var(--line); padding:56px 0 40px; }
+.foot-grid{ display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; align-items:flex-start; }
+.foot-brand{ max-width:300px; }
+.foot-brand p{ color:var(--ink-2); font-size:14.5px; margin-top:14px; }
+.foot-cols{ display:flex; gap:64px; flex-wrap:wrap; }
+.foot-col h4{ font-size:13px; text-transform:uppercase; letter-spacing:.12em; color:var(--ink-3); margin:0 0 14px; font-weight:600; }
+.foot-col a{ display:block; color:var(--ink-2); font-size:15px; margin-bottom:11px; transition:color .2s; }
+.foot-col a:hover{ color:var(--brand-ink); }
+.foot-bottom{ margin-top:48px; padding-top:24px; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; color:var(--ink-3); font-size:13.5px; }
+
+/* ---------- reveal animation ---------- */
+.js .reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1); }
+.reveal.in{ opacity:1; transform:none; }
+/* hero staggered load */
+.load{ opacity:0; transform:translateY(16px); animation:rise .8s cubic-bezier(.22,.61,.36,1) forwards; }
+.load.d1{ animation-delay:.05s; } .load.d2{ animation-delay:.16s; } .load.d3{ animation-delay:.27s; }
+.load.d4{ animation-delay:.38s; } .load.d5{ animation-delay:.5s; }
+@keyframes rise{ to{ opacity:1; transform:none; } }
+
+/* ---------- responsive ---------- */
+@media (max-width:960px){
+  .hero-grid{ grid-template-columns:1fr; gap:48px; text-align:center; }
+  .hero-sub{ margin-left:auto; margin-right:auto; }
+  .hero-actions, .hero-note{ justify-content:center; }
+  .hero-art{ margin-top:8px; }
+  .bento{ grid-template-columns:repeat(2,1fr); }
+  .card.col-3, .card.col-2{ grid-column:span 1; }
+  .show{ grid-template-columns:1fr; gap:34px; }
+  .show.flip .show-art{ order:0; }
+  .show-copy{ text-align:center; }
+  .show-list{ display:inline-grid; text-align:left; }
+  .share-stage{ grid-template-columns:1fr; gap:34px; text-align:center; }
+  .share-list{ display:inline-grid; text-align:left; }
+  .priv-grid{ grid-template-columns:1fr; }
+  .split{ grid-template-columns:1fr; }
+}
+@media (max-width:680px){
+  .nav-links{ display:none; }
+  section{ padding:72px 0; }
+  .bento{ grid-template-columns:1fr; }
+  .hero-art .phone.back{ display:none; }
+  .panel{ padding:30px; }
+  .share-stage{ padding:34px 24px; }
+}
+@media (prefers-reduced-motion:reduce){
+  *{ animation:none !important; transition:none !important; }
+  .js .reveal{ opacity:1; transform:none; }
+  html{ scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="ChukkaTimer home">
+      <span class="glyph" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5a5.5 5.5 0 015.5 5.5c0 3.5 1 5 2 6.2.4.5 0 1.3-.7 1.3H5.2c-.7 0-1.1-.8-.7-1.3 1-1.2 2-2.7 2-6.2A5.5 5.5 0 0112 3.5z" fill="#e3c46f"/><path d="M10 19.5a2 2 0 004 0" stroke="#e3c46f" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      ChukkaTimer
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#features">Features</a>
+      <a href="#screens">Screens</a>
+      <a href="#club">Club chukkas</a>
+      <a href="#sharing">Live sharing</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-primary" href="https://apps.apple.com/app/id6740096681">Get the app</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="pill load d1"><span class="dot"></span> For iPhone · Polo timing &amp; live scoring</span>
+      <h1 class="hero-title load d2">Polo timing,<br><em>beautifully kept.</em></h1>
+      <p class="hero-sub load d3">ChukkaTimer is the essential app for the field: a one-tap <strong>chukka timer</strong> with warning bells, a full <strong>game mode</strong> with handicaps and scoring, <strong>club chukkas</strong> with rotating sides, and <strong>live sharing</strong> so anyone can follow along.</p>
+      <div class="hero-actions load d4">
+        <a class="badge-apple" href="https://apps.apple.com/app/id6740096681" aria-label="Download ChukkaTimer on the App Store">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.36 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.71-3.19-1.73-1.36-.14-2.65.8-3.34.8-.68 0-1.75-.78-2.87-.76-1.48.02-2.84.86-3.6 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.25 2.74 2.21 1.1-.04 1.51-.71 2.85-.71 1.33 0 1.71.71 2.87.69 1.18-.02 1.94-1.08 2.66-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.34-3.53zM14.2 5.83c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.55 1.31-.56.64-1.05 1.67-.92 2.66.97.07 1.96-.49 2.57-1.21z"/></svg>
+          <span class="b-txt"><small>Download on the</small><strong>App Store</strong></span>
+        </a>
+        <a class="btn btn-ghost" href="#screens">See it in action</a>
+      </div>
+      <div class="hero-note load d5">
+        <span><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> No account needed</span>
+        <span><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Works offline</span>
+        <span><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Live Activities</span>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <div class="phone back" aria-hidden="true">
+        <span class="island"></span>
+        <div class="screen"><img src="assets/shot-games.png" alt="" loading="lazy" /></div>
+      </div>
+      <div class="phone main">
+        <span class="island"></span>
+        <div class="screen"><img src="assets/shot-timer.png" alt="ChukkaTimer simple timer counting down a seven-minute chukka" /></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRUST STRIP ================= -->
+<div class="strip">
+  <div class="wrap">
+    <span class="item"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 3h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> One-tap 7-minute chukka</span>
+    <span class="item"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4a5 5 0 015 5c0 3.2.9 4.6 1.8 5.7.3.4 0 1.1-.6 1.1H5.8c-.6 0-.9-.7-.6-1.1C6.1 13.6 7 12.2 7 9a5 5 0 015-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10.5 19a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> 30-second warning bell</span>
+    <span class="item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Full game &amp; score mode</span>
+    <span class="item"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 8l7-5 7 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Automatic HPA handicaps</span>
+    <span class="item"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/><rect x="4" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/><path d="M14 14h2v2m4-2v6m-6 0h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Live sharing + QR</span>
+  </div>
+</div>
+
+<!-- ================= FEATURES (bento) ================= -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Everything for the field</span>
+      <h2 class="serif">From practice chukkas to match day.</h2>
+      <p>Whether you're umpiring a club game or keeping time for your team, ChukkaTimer has exactly what you need — and nothing in the way.</p>
+    </div>
+
+    <div class="bento">
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 3h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Simple Timer</h3>
+        <p>Start a 7-minute chukka with one tap. Audible bells at the 30-second warning and the end of the chukka — just like on the field.</p>
+      </div>
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="18" r="3" stroke="currentColor" stroke-width="2"/></svg></div>
+        <h3>Full Game Mode</h3>
+        <p>Set up a complete match: team names and colours, multiple chukkas, and score tracking chukka by chukka with full history.</p>
+      </div>
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="8.5" r="3" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="8.5" r="3" stroke="currentColor" stroke-width="2"/><path d="M2.5 19c0-2.5 2.4-4 5.5-4s5.5 1.5 5.5 4M13.5 18.5c.3-2.2 2.6-3.5 5.4-3.5 1 0 1.9.1 2.6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Club Chukkas</h3>
+        <p>Run informal club sessions with rotating Whites &amp; Blacks sides. The live board shows who's on now and who's up next — nobody misses their chukka.</p>
+      </div>
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 8l7-5 7 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8v6a7 4 0 0014 0V8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <h3>Automatic Handicaps</h3>
+        <p>ChukkaTimer calculates the HPA handicap goal start for you, and folds it into the live score. No mental arithmetic mid-match.</p>
+      </div>
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/><rect x="4" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/><path d="M14 14h2v2m4-2v6m-6 0h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Live Sharing &amp; QR</h3>
+        <p>Share a link or QR code and friends, family, and spectators follow the match live in any browser. No app required for viewers.</p>
+      </div>
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="3" stroke="currentColor" stroke-width="2"/><path d="M10 7h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Live Activities</h3>
+        <p>Keep the countdown on your Lock Screen and in the Dynamic Island. Glance down and see the time left without unlocking.</p>
+      </div>
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4a5 5 0 015 5c0 3.2.9 4.6 1.8 5.7.3.4 0 1.1-.6 1.1H5.8c-.6 0-.9-.7-.6-1.1C6.1 13.6 7 12.2 7 9a5 5 0 015-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10.5 19a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Bell Sounds</h3>
+        <p>Choose between three different bell sounds, and set the chukka length (1–15 min) and extra time (0–60 sec) to match your club.</p>
+      </div>
+      <div class="card col-2 reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Works Offline</h3>
+        <p>No account, no sign-up, no data collected. Everything runs on your phone, so it just works — even where the signal doesn't.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SHOWCASE ================= -->
+<section id="screens" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+
+    <div class="show">
+      <div class="show-art reveal">
+        <div class="phone"><span class="island"></span><div class="screen"><img src="assets/shot-timer.png" alt="ChukkaTimer simple timer showing seven minutes remaining" loading="lazy" /></div></div>
+      </div>
+      <div class="show-copy reveal">
+        <span class="eyebrow">Simple timer</span>
+        <h2 class="serif">One tap. Seven minutes. Go.</h2>
+        <p>The fastest way to time a chukka. Big, glanceable digits you can read across the field, with the warning and end-of-chukka bells handled for you.</p>
+        <ul class="show-list">
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Start, pause, and reset with a tap</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Automatic 30-second warning bell</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Extra time runs on after the chukka ends</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="show flip">
+      <div class="show-art reveal">
+        <div class="phone"><span class="island"></span><div class="screen"><img src="assets/shot-games.png" alt="ChukkaTimer game mode list of matches" loading="lazy" /></div></div>
+      </div>
+      <div class="show-copy reveal">
+        <span class="eyebrow">Game mode</span>
+        <h2 class="serif">Run the whole match.</h2>
+        <p>Keep your matches in one place. Each game holds its teams, chukkas, and running score, so you can pick up exactly where you left off.</p>
+        <ul class="show-list">
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Multiple games saved on device</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Score tracked chukka by chukka</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Set up a new match in seconds</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="show">
+      <div class="show-art reveal">
+        <div class="phone"><span class="island"></span><div class="screen"><img src="assets/shot-detail.png" alt="ChukkaTimer game detail showing teams, colours, handicaps and score" loading="lazy" /></div></div>
+      </div>
+      <div class="show-copy reveal">
+        <span class="eyebrow">Teams &amp; handicaps</span>
+        <h2 class="serif">Colours, handicaps — all sorted.</h2>
+        <p>Name your teams, pick their colours, and set each side's handicap. ChukkaTimer works out the goal start and shows the adjusted score at a glance.</p>
+        <ul class="show-list">
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Team names and shirt colours</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Automatic handicap goal start</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Configurable chukkas, length, and extra time</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= CLUB CHUKKAS ================= -->
+<section id="club" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Club chukkas</span>
+      <h2 class="serif">Built for club play, not just matches.</h2>
+      <p>Club chukkas don't fit a fixed two-team fixture — sides are picked fresh each chukka, Whites and Blacks, from a rotating roster. ChukkaTimer runs the session and broadcasts a live board, so the whole club stays in sync.</p>
+    </div>
+
+    <div class="webframe reveal">
+      <div class="webbar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="url">chukkatimer.marcuslab.uk/saturday-club-chukkas</span></div>
+      <img src="assets/shot-club.png" alt="ChukkaTimer club chukkas live board in a browser: the current chukka and timer, with the Whites and Blacks line-ups for now and up next" loading="lazy" />
+    </div>
+    <p class="webcap reveal">No scores to chase — just the time, the chukka number, and exactly who's on. Everyone at the club opens the same board on their phone.</p>
+
+    <div class="club-feats">
+      <div class="pt reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0114-5m2 5a8 8 0 01-14 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Rotating sides</h3>
+        <p>Whites and Blacks are set per chukka — the line-up that changes from chukka to chukka is the data.</p>
+      </div>
+      <div class="pt reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 3h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Now &amp; up next</h3>
+        <p>A clear board shows who's on the pitch right now and who's up next, so the next four can start tacking up.</p>
+      </div>
+      <div class="pt reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Find me</h3>
+        <p>Pin your name and the board highlights you — "on now", "up next", or "done" — no squinting at a paper sheet.</p>
+      </div>
+      <div class="pt reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M4 9h16M9 4v16" stroke="currentColor" stroke-width="2"/></svg></div>
+        <h3>From your chukka sheet</h3>
+        <p>Built around how clubs already work — players down the rows, chukkas across the top, W / B in each cell.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIVE SHARING ================= -->
+<section id="sharing">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Live sharing</span>
+      <h2 class="serif">Let everyone follow the match.</h2>
+      <p>Tap share to get a link and a QR code. Spectators open it in any browser — no app, no account — and watch the game unfold in real time.</p>
+    </div>
+
+    <div class="webframe reveal">
+      <div class="webbar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="url">chukkatimer.marcuslab.uk/foxcote-vs-park-place</span></div>
+      <img src="assets/shot-live.png" alt="ChukkaTimer live spectator view in a browser: team scores with handicap, a running chukka timer, and chukka progress" loading="lazy" />
+    </div>
+    <p class="webcap reveal">The spectator view, styled to match the app — live scores, a real-time countdown, and chukka progress, all in the browser.</p>
+
+    <div class="share-stage reveal" style="margin-top:64px;">
+      <div class="share-copy">
+        <h2 class="serif">Real-time, in any browser.</h2>
+        <p>The moment a goal goes in or a chukka ends, everyone watching sees it update. Perfect for friends and family who couldn't make it pitch-side.</p>
+        <ul class="share-list">
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Live scores, team colours, and chukka progress</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> A real-time countdown, synced to your phone</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Share by link or QR code in one tap</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Viewers need nothing installed</li>
+        </ul>
+      </div>
+      <div class="share-qr">
+        <div class="qr-card">
+          <div class="qr" aria-hidden="true">
+            <svg viewBox="0 0 29 29" shape-rendering="crispEdges" fill="#16201a"><path d="M0 0h7v7h-7zM8 0h1v1h-1zM10 0h2v1h-2zM13 0h1v3h-1zM15 0h1v1h-1zM17 0h1v2h-1zM22 0h7v7h-7zM1 1h5v5h-5zM9 1h1v2h-1zM11 1h1v1h-1zM16 1h1v3h-1zM19 1h2v1h-2zM23 1h5v5h-5zM2 2h3v3h-3zM11 2h2v1h-2zM18 2h1v1h-1zM20 2h1v2h-1zM24 2h3v3h-3zM10 3h1v1h-1zM12 3h1v2h-1zM15 3h1v1h-1zM10 4h1v2h-1zM14 4h1v1h-1zM17 4h2v1h-2zM8 5h1v1h-1zM13 5h1v1h-1zM16 5h1v2h-1zM19 5h1v3h-1zM0 8h1v1h-1zM2 8h2v1h-2zM5 8h1v2h-1zM8 8h2v1h-2zM12 8h1v1h-1zM14 8h3v1h-3zM21 8h2v1h-2zM25 8h1v1h-1zM27 8h2v1h-2zM1 9h1v3h-1zM7 9h1v1h-1zM9 9h2v2h-2zM13 9h1v2h-1zM18 9h1v1h-1zM24 9h1v2h-1zM26 9h1v1h-1zM3 10h2v1h-2zM6 10h1v2h-1zM12 10h1v3h-1zM15 10h2v1h-2zM20 10h2v1h-2zM23 10h1v1h-1zM28 10h1v3h-1zM2 11h1v1h-1zM4 11h1v2h-1zM8 11h1v1h-1zM16 11h2v1h-2zM19 11h1v2h-1zM22 11h1v2h-1zM26 11h2v1h-2zM0 12h1v3h-1zM7 12h1v3h-1zM10 12h1v1h-1zM14 12h1v2h-1zM17 12h1v1h-1zM21 12h1v1h-1zM25 12h1v3h-1zM3 13h1v1h-1zM5 13h2v1h-2zM9 13h1v2h-1zM16 13h1v2h-1zM18 13h1v1h-1zM20 13h1v2h-1zM24 13h1v1h-1zM27 13h2v1h-2zM2 14h2v1h-2zM11 14h2v1h-2zM15 14h1v1h-1zM22 14h2v1h-2zM26 14h1v2h-1zM8 15h2v1h-2zM12 15h1v2h-1zM14 15h1v1h-1zM17 15h2v1h-2zM21 15h1v3h-1zM23 15h1v1h-1zM0 16h2v1h-2zM4 16h2v1h-2zM10 16h1v1h-1zM15 16h1v3h-1zM19 16h1v1h-1zM24 16h2v1h-2zM28 16h1v3h-1zM3 17h1v2h-1zM6 17h1v1h-1zM9 17h1v2h-1zM13 17h1v1h-1zM18 17h1v2h-1zM22 17h1v1h-1zM25 17h1v1h-1zM1 18h1v1h-1zM5 18h1v3h-1zM11 18h1v2h-1zM14 18h1v1h-1zM20 18h1v1h-1zM23 18h2v1h-2zM27 18h1v1h-1zM8 19h1v1h-1zM10 19h1v1h-1zM16 19h3v1h-3zM21 19h1v2h-1zM24 19h1v2h-1zM26 19h1v1h-1zM0 20h7v7h-7zM9 20h1v1h-1zM12 20h2v1h-2zM15 20h1v2h-1zM19 20h1v1h-1zM1 21h5v5h-5zM8 21h1v2h-1zM10 21h2v1h-2zM13 21h1v1h-1zM17 21h2v1h-2zM20 21h1v2h-1zM27 21h2v1h-2zM2 22h3v3h-3zM12 22h1v3h-1zM14 22h1v1h-1zM16 22h1v2h-1zM23 22h1v1h-1zM25 22h2v1h-2zM9 23h2v1h-2zM18 23h2v1h-2zM22 23h1v2h-1zM28 23h1v2h-1zM10 24h1v2h-1zM14 24h1v2h-1zM17 24h1v1h-1zM19 24h2v1h-2zM24 24h2v1h-2zM27 24h1v1h-1zM8 25h1v1h-1zM13 25h1v1h-1zM16 25h1v1h-1zM21 25h1v2h-1zM26 25h1v2h-1zM9 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h2v1h-2zM23 26h2v1h-2zM12 27h2v1h-2zM19 27h2v1h-2zM24 27h1v1h-1z"/></svg>
+          </div>
+          <div class="qr-label">Scan to watch live</div>
+          <div class="qr-sub">Opens in any browser — no app needed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sharing-block show">
+      <div class="show-art reveal">
+        <div class="phone"><span class="island"></span><div class="screen"><img src="assets/shot-settings.png" alt="ChukkaTimer settings for chukka length, extra time and bell sound" loading="lazy" /></div></div>
+      </div>
+      <div class="show-copy reveal">
+        <span class="eyebrow">Make it yours</span>
+        <h2 class="serif">Tune every chukka.</h2>
+        <p>Match your club's rules in a few taps. Set the chukka length, how much extra time runs on, and which bell sounds across the field.</p>
+        <ul class="show-list">
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Chukka length from 1 to 15 minutes</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Extra time from 0 to 60 seconds</li>
+          <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Choose from three bell sounds</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= PRIVACY ================= -->
+<section class="privacy" id="privacy">
+  <div class="wrap">
+    <span class="eyebrow reveal">No account. No tracking.</span>
+    <h2 class="serif reveal" style="margin-top:14px;">Just polo.</h2>
+    <p class="lead reveal">ChukkaTimer keeps it simple. There's no sign-up, no analytics, and no data collection. It runs on your phone and stays out of your way.</p>
+    <div class="priv-grid">
+      <div class="priv-card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Data not collected</h3>
+        <p>The App Store privacy label says it all: ChukkaTimer collects nothing about you.</p>
+      </div>
+      <div class="priv-card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>No account required</h3>
+        <p>Open the app and start timing. No email, no password, nothing to sign up for.</p>
+      </div>
+      <div class="priv-card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4a5 5 0 015 5c0 3.2.9 4.6 1.8 5.7.3.4 0 1.1-.6 1.1H5.8c-.6 0-.9-.7-.6-1.1C6.1 13.6 7 12.2 7 9a5 5 0 015-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10.5 19a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Works offline</h3>
+        <p>Timer and game mode run entirely on device. Live sharing is the only thing that uses the network — and only when you choose to.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIVE ACTIVITIES + SUPPORT ================= -->
+<section id="support">
+  <div class="wrap split">
+    <div class="panel reveal">
+      <div class="ic-lg"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="3" stroke="currentColor" stroke-width="2"/><path d="M9 6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9.5 10.5h5M10.5 13.5h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <span class="eyebrow">On your Lock Screen</span>
+      <h2 class="serif" style="margin-top:10px;">Glance down, stay in the game.</h2>
+      <p>A Live Activity keeps the countdown on your Lock Screen and in the Dynamic Island, so you can set the phone down on the pony lines and still see exactly how long is left in the chukka.</p>
+    </div>
+    <div class="panel tint reveal">
+      <div class="ic-lg"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-8.5C1 9.5 2.5 6 6 6c2 0 3 1.2 4 2.5C11 7.2 12 6 14 6c3.5 0 5 3.5 3.5 6.5C19 16.65 12 21 12 21z"/></svg></div>
+      <span class="eyebrow">Support development</span>
+      <h2 class="serif" style="margin-top:10px;">Made by one person.</h2>
+      <p>ChukkaTimer is built and maintained by a single developer who plays polo. If it earns a place in your kit bag, a tip or sponsorship helps keep it going.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="https://github.com/sponsors/marco308">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7-4.35-9.5-8.5C1 9.5 2.5 6 6 6c2 0 3 1.2 4 2.5C11 7.2 12 6 14 6c3.5 0 5 3.5 3.5 6.5C19 16.65 12 21 12 21z"/></svg>
+          Sponsor on GitHub
+        </a>
+        <a class="btn btn-ghost" href="https://www.buymeacoffee.com/losperdidos">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 8h11v5a4 4 0 01-4 4H9a4 4 0 01-4-4V8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 9h2.5a2.5 2.5 0 010 5H16" stroke="currentColor" stroke-width="2"/><path d="M7 3c0 1-1 1.5-1 2.5M11 3c0 1-1 1.5-1 2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Buy me a coffee
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section class="final">
+  <div class="wrap">
+    <div class="box reveal">
+      <h2 class="serif">Ready for the next chukka?</h2>
+      <p>Download ChukkaTimer and be ready before the bell.</p>
+      <div class="actions">
+        <a class="badge-apple" href="https://apps.apple.com/app/id6740096681" aria-label="Download ChukkaTimer on the App Store">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.36 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.71-3.19-1.73-1.36-.14-2.65.8-3.34.8-.68 0-1.75-.78-2.87-.76-1.48.02-2.84.86-3.6 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.25 2.74 2.21 1.1-.04 1.51-.71 2.85-.71 1.33 0 1.71.71 2.87.69 1.18-.02 1.94-1.08 2.66-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.34-3.53zM14.2 5.83c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.55 1.31-.56.64-1.05 1.67-.92 2.66.97.07 1.96-.49 2.57-1.21z"/></svg>
+          <span class="b-txt"><small>Download on the</small><strong>App Store</strong></span>
+        </a>
+      </div>
+      <p class="req">Requires iPhone with iOS 17 or later. Free to download.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top" aria-label="ChukkaTimer home">
+          <span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5a5.5 5.5 0 015.5 5.5c0 3.5 1 5 2 6.2.4.5 0 1.3-.7 1.3H5.2c-.7 0-1.1-.8-.7-1.3 1-1.2 2-2.7 2-6.2A5.5 5.5 0 0112 3.5z" fill="#e3c46f"/><path d="M10 19.5a2 2 0 004 0" stroke="#e3c46f" stroke-width="2" stroke-linecap="round"/></svg></span>
+          ChukkaTimer
+        </a>
+        <p>The essential polo timing app for iPhone. Timer, scoring, handicaps, and live sharing — built for the field.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>App</h4>
+          <a href="#features">Features</a>
+          <a href="#screens">Screens</a>
+          <a href="#sharing">Live sharing</a>
+          <a href="#privacy">Privacy</a>
+          <a href="https://apps.apple.com/app/id6740096681">App Store</a>
+        </div>
+        <div class="foot-col">
+          <h4>For polo</h4>
+          <a href="#features">Game mode</a>
+          <a href="#club">Club chukkas</a>
+          <a href="#features">Handicaps</a>
+          <a href="#sharing">Spectator sharing</a>
+        </div>
+        <div class="foot-col">
+          <h4>Support</h4>
+          <a href="https://github.com/sponsors/marco308">GitHub Sponsors</a>
+          <a href="https://www.buymeacoffee.com/losperdidos">Buy me a coffee</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 ChukkaTimer. Made for polo.</span>
+      <span>Not affiliated with the Hurlingham Polo Association.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Sticky-nav hairline on scroll
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive:true });
+
+  // Scroll-reveal
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const els = document.querySelectorAll('.reveal');
+  if (reduce || !('IntersectionObserver' in window)) {
+    els.forEach(el => el.classList.add('in'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          // gentle stagger within a viewport batch
+          e.target.style.transitionDelay = Math.min(i * 60, 240) + 'ms';
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(el => io.observe(el));
+  }
+</script>
+</body>
+</html>
