@@ -276,7 +276,8 @@ section{ padding:96px 0; }
 .qr-card .qr-sub{ margin-top:6px; font-size:14px; color:var(--ink-2); }
 
 /* browser-framed live-site mockup */
-.webframe{ max-width:900px; margin:0 auto 8px; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow-lg); background:#fff; }
+.webframe{ display:block; max-width:900px; margin:0 auto 8px; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow-lg); background:#fff; transition:transform .25s ease, box-shadow .3s ease; }
+a.webframe:hover{ transform:translateY(-3px); box-shadow:0 48px 90px -30px rgba(12,40,24,.5); }
 .webbar{ height:44px; background:var(--bg-2); border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 16px; gap:8px; }
 .webbar i{ width:12px; height:12px; border-radius:50%; display:block; flex:none; }
 .webbar .r{ background:#ff5f57; } .webbar .y{ background:#febc2e; } .webbar .g{ background:#28c840; }
@@ -581,10 +582,10 @@ footer{ background:var(--bg-2); border-top:1px solid var(--line); padding:56px 0
       <p>Club chukkas don't fit a fixed two-team fixture — sides are picked fresh each chukka, Whites and Blacks, from a rotating roster. ChukkaTimer runs the session and broadcasts a live board, so the whole club stays in sync.</p>
     </div>
 
-    <div class="webframe reveal">
+    <a class="webframe reveal" href="https://chukkatimer.marcuslab.uk" target="_blank" rel="noopener" aria-label="Open the live ChukkaTimer viewer">
       <div class="webbar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="url">chukkatimer.marcuslab.uk/saturday-club-chukkas</span></div>
       <img src="assets/shot-club.png" alt="ChukkaTimer club chukkas live board in a browser: the current chukka and timer, with the Whites and Blacks line-ups for now and up next" loading="lazy" />
-    </div>
+    </a>
     <p class="webcap reveal">No scores to chase — just the time, the chukka number, and exactly who's on. Everyone at the club opens the same board on their phone.</p>
 
     <div class="club-feats">
@@ -619,13 +620,14 @@ footer{ background:var(--bg-2); border-top:1px solid var(--line); padding:56px 0
       <span class="eyebrow">Live sharing</span>
       <h2 class="serif">Let everyone follow the match.</h2>
       <p>Tap share to get a link and a QR code. Spectators open it in any browser — no app, no account — and watch the game unfold in real time.</p>
+      <div style="margin-top:26px;"><a class="btn btn-primary" href="https://chukkatimer.marcuslab.uk" target="_blank" rel="noopener">View live games →</a></div>
     </div>
 
-    <div class="webframe reveal">
+    <a class="webframe reveal" href="https://chukkatimer.marcuslab.uk" target="_blank" rel="noopener" aria-label="Open the live ChukkaTimer game viewer">
       <div class="webbar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="url">chukkatimer.marcuslab.uk/foxcote-vs-park-place</span></div>
       <img src="assets/shot-live.png" alt="ChukkaTimer live spectator view in a browser: team scores with handicap, a running chukka timer, and chukka progress" loading="lazy" />
-    </div>
-    <p class="webcap reveal">The spectator view, styled to match the app — live scores, a real-time countdown, and chukka progress, all in the browser.</p>
+    </a>
+    <p class="webcap reveal">The spectator view, styled to match the app — live scores, a real-time countdown, and chukka progress, all in the browser. <a href="https://chukkatimer.marcuslab.uk" target="_blank" rel="noopener" style="color:var(--brand-ink);font-weight:600;">See it live →</a></p>
 
     <div class="share-stage reveal" style="margin-top:64px;">
       <div class="share-copy">
@@ -707,13 +709,9 @@ footer{ background:var(--bg-2); border-top:1px solid var(--line); padding:56px 0
       <div class="ic-lg"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-8.5C1 9.5 2.5 6 6 6c2 0 3 1.2 4 2.5C11 7.2 12 6 14 6c3.5 0 5 3.5 3.5 6.5C19 16.65 12 21 12 21z"/></svg></div>
       <span class="eyebrow">Support development</span>
       <h2 class="serif" style="margin-top:10px;">Made by one person.</h2>
-      <p>ChukkaTimer is built and maintained by a single developer who plays polo. If it earns a place in your kit bag, a tip or sponsorship helps keep it going.</p>
+      <p>ChukkaTimer is built and maintained by a single developer who plays polo. If it earns a place in your kit bag, a coffee helps keep it going.</p>
       <div class="actions">
-        <a class="btn btn-primary" href="https://github.com/sponsors/marco308">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7-4.35-9.5-8.5C1 9.5 2.5 6 6 6c2 0 3 1.2 4 2.5C11 7.2 12 6 14 6c3.5 0 5 3.5 3.5 6.5C19 16.65 12 21 12 21z"/></svg>
-          Sponsor on GitHub
-        </a>
-        <a class="btn btn-ghost" href="https://www.buymeacoffee.com/losperdidos">
+        <a class="btn btn-primary" href="https://www.buymeacoffee.com/losperdidos">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 8h11v5a4 4 0 01-4 4H9a4 4 0 01-4-4V8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 9h2.5a2.5 2.5 0 010 5H16" stroke="currentColor" stroke-width="2"/><path d="M7 3c0 1-1 1.5-1 2.5M11 3c0 1-1 1.5-1 2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           Buy me a coffee
         </a>
@@ -758,6 +756,7 @@ footer{ background:var(--bg-2); border-top:1px solid var(--line); padding:56px 0
           <a href="#features">Features</a>
           <a href="#screens">Screens</a>
           <a href="#sharing">Live sharing</a>
+          <a href="https://chukkatimer.marcuslab.uk">Live game viewer</a>
           <a href="#privacy">Privacy</a>
           <a href="https://apps.apple.com/app/id6740096681">App Store</a>
         </div>
@@ -770,7 +769,6 @@ footer{ background:var(--bg-2); border-top:1px solid var(--line); padding:56px 0
         </div>
         <div class="foot-col">
           <h4>Support</h4>
-          <a href="https://github.com/sponsors/marco308">GitHub Sponsors</a>
           <a href="https://www.buymeacoffee.com/losperdidos">Buy me a coffee</a>
         </div>
       </div>
