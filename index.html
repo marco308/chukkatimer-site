@@ -252,7 +252,7 @@ section{ padding:96px 0; }
 
 /* ---------- live sharing highlight ---------- */
 .share-stage{
-  display:grid; grid-template-columns:1.1fr .9fr; gap:48px; align-items:center;
+  display:grid; grid-template-columns:1fr; gap:48px; align-items:center; text-align:center;
   padding:52px 48px; border-radius:var(--r-lg);
   background:
     radial-gradient(120% 140% at 12% 0%, rgba(31,122,82,.30), transparent 55%),
@@ -261,18 +261,10 @@ section{ padding:96px 0; }
 }
 .share-stage h2{ font-size:clamp(26px,3.4vw,38px); }
 .share-stage p{ color:var(--ink-2); margin-top:16px; font-size:17px; }
-.share-list{ list-style:none; padding:0; margin:22px 0 0; display:grid; gap:11px; }
+.share-copy{ max-width:640px; margin:0 auto; }
+.share-list{ list-style:none; padding:0; margin:22px 0 0; display:inline-grid; gap:11px; text-align:left; }
 .share-list li{ display:flex; gap:11px; align-items:flex-start; font-size:15.5px; }
 .share-list svg{ width:20px; height:20px; color:var(--brand); flex:none; margin-top:2px; }
-.share-qr{ display:flex; justify-content:center; }
-.qr-card{
-  background:#fff; border:1px solid var(--line); border-radius:var(--r-md);
-  padding:26px; box-shadow:var(--shadow-md); text-align:center; max-width:300px;
-}
-.qr-card .qr{ width:170px; height:170px; margin:0 auto; }
-.qr-card .qr svg{ width:100%; height:100%; }
-.qr-card .qr-label{ margin-top:16px; font-size:13px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); }
-.qr-card .qr-sub{ margin-top:6px; font-size:14px; color:var(--ink-2); }
 
 /* browser-framed live-site mockup */
 .webframe{ display:block; max-width:900px; margin:0 auto 8px; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow-lg); background:#fff; transition:transform .25s ease, box-shadow .3s ease; }
@@ -638,15 +630,6 @@ footer{ background:var(--bg-2); border-top:1px solid var(--line); padding:56px 0
           <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Share by link or QR code in one tap</li>
           <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Viewers need nothing installed</li>
         </ul>
-      </div>
-      <div class="share-qr">
-        <div class="qr-card">
-          <div class="qr" aria-hidden="true">
-            <svg viewBox="0 0 29 29" shape-rendering="crispEdges" fill="#16201a"><path d="M0 0h7v7h-7zM8 0h1v1h-1zM10 0h2v1h-2zM13 0h1v3h-1zM15 0h1v1h-1zM17 0h1v2h-1zM22 0h7v7h-7zM1 1h5v5h-5zM9 1h1v2h-1zM11 1h1v1h-1zM16 1h1v3h-1zM19 1h2v1h-2zM23 1h5v5h-5zM2 2h3v3h-3zM11 2h2v1h-2zM18 2h1v1h-1zM20 2h1v2h-1zM24 2h3v3h-3zM10 3h1v1h-1zM12 3h1v2h-1zM15 3h1v1h-1zM10 4h1v2h-1zM14 4h1v1h-1zM17 4h2v1h-2zM8 5h1v1h-1zM13 5h1v1h-1zM16 5h1v2h-1zM19 5h1v3h-1zM0 8h1v1h-1zM2 8h2v1h-2zM5 8h1v2h-1zM8 8h2v1h-2zM12 8h1v1h-1zM14 8h3v1h-3zM21 8h2v1h-2zM25 8h1v1h-1zM27 8h2v1h-2zM1 9h1v3h-1zM7 9h1v1h-1zM9 9h2v2h-2zM13 9h1v2h-1zM18 9h1v1h-1zM24 9h1v2h-1zM26 9h1v1h-1zM3 10h2v1h-2zM6 10h1v2h-1zM12 10h1v3h-1zM15 10h2v1h-2zM20 10h2v1h-2zM23 10h1v1h-1zM28 10h1v3h-1zM2 11h1v1h-1zM4 11h1v2h-1zM8 11h1v1h-1zM16 11h2v1h-2zM19 11h1v2h-1zM22 11h1v2h-1zM26 11h2v1h-2zM0 12h1v3h-1zM7 12h1v3h-1zM10 12h1v1h-1zM14 12h1v2h-1zM17 12h1v1h-1zM21 12h1v1h-1zM25 12h1v3h-1zM3 13h1v1h-1zM5 13h2v1h-2zM9 13h1v2h-1zM16 13h1v2h-1zM18 13h1v1h-1zM20 13h1v2h-1zM24 13h1v1h-1zM27 13h2v1h-2zM2 14h2v1h-2zM11 14h2v1h-2zM15 14h1v1h-1zM22 14h2v1h-2zM26 14h1v2h-1zM8 15h2v1h-2zM12 15h1v2h-1zM14 15h1v1h-1zM17 15h2v1h-2zM21 15h1v3h-1zM23 15h1v1h-1zM0 16h2v1h-2zM4 16h2v1h-2zM10 16h1v1h-1zM15 16h1v3h-1zM19 16h1v1h-1zM24 16h2v1h-2zM28 16h1v3h-1zM3 17h1v2h-1zM6 17h1v1h-1zM9 17h1v2h-1zM13 17h1v1h-1zM18 17h1v2h-1zM22 17h1v1h-1zM25 17h1v1h-1zM1 18h1v1h-1zM5 18h1v3h-1zM11 18h1v2h-1zM14 18h1v1h-1zM20 18h1v1h-1zM23 18h2v1h-2zM27 18h1v1h-1zM8 19h1v1h-1zM10 19h1v1h-1zM16 19h3v1h-3zM21 19h1v2h-1zM24 19h1v2h-1zM26 19h1v1h-1zM0 20h7v7h-7zM9 20h1v1h-1zM12 20h2v1h-2zM15 20h1v2h-1zM19 20h1v1h-1zM1 21h5v5h-5zM8 21h1v2h-1zM10 21h2v1h-2zM13 21h1v1h-1zM17 21h2v1h-2zM20 21h1v2h-1zM27 21h2v1h-2zM2 22h3v3h-3zM12 22h1v3h-1zM14 22h1v1h-1zM16 22h1v2h-1zM23 22h1v1h-1zM25 22h2v1h-2zM9 23h2v1h-2zM18 23h2v1h-2zM22 23h1v2h-1zM28 23h1v2h-1zM10 24h1v2h-1zM14 24h1v2h-1zM17 24h1v1h-1zM19 24h2v1h-2zM24 24h2v1h-2zM27 24h1v1h-1zM8 25h1v1h-1zM13 25h1v1h-1zM16 25h1v1h-1zM21 25h1v2h-1zM26 25h1v2h-1zM9 26h1v1h-1zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h2v1h-2zM23 26h2v1h-2zM12 27h2v1h-2zM19 27h2v1h-2zM24 27h1v1h-1z"/></svg>
-          </div>
-          <div class="qr-label">Scan to watch live</div>
-          <div class="qr-sub">Opens in any browser — no app needed</div>
-        </div>
       </div>
     </div>
 
